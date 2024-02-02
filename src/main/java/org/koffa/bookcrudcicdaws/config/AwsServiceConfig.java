@@ -1,5 +1,6 @@
 package org.koffa.bookcrudcicdaws.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
@@ -12,8 +13,10 @@ import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 @Configuration
 public class AwsServiceConfig {
     Region region = Region.EU_NORTH_1;
-    String accessKeyId = "AKIAVRUVPN6RPO2OTD4Z";
-    String secretAccessKey = "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";
+    @Value("${aws.access.key.id}")
+    String accessKeyId;
+    @Value("${aws.secret.access.key}")
+    String secretAccessKey;
 
     @Bean
     public DynamoDbClient dynamoDbClient(AwsCredentialsProvider awsCredentialsProvider) {
