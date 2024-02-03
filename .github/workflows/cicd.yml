@@ -27,7 +27,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/bookcrud-cicd-aws:test
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/bookcrud-cicd-aws:latest
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
