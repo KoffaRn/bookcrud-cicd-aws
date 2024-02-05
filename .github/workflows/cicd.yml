@@ -43,14 +43,14 @@ jobs:
           chmod 600 key.pem
       - name: Log in to docker
         run: |
-          ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@$bookcrud-cicd-aws.duckdns.org 'sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}'
+          ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@bookcrud-cicd-aws.duckdns.org 'sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}'
       - name: Pull docker image
         run: |
-          ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@$bookcrud-cicd-aws.duckdns.org 'sudo docker pull koffarn/bookcrud-cicd-aws:latest'
+          ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@bookcrud-cicd-aws.duckdns.org 'sudo docker pull koffarn/bookcrud-cicd-aws:latest'
       - name: Stop and remove old container
         run: |
-          ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@$bookcrud-cicd-aws.duckdns.org 'sudo docker stop bookcrud-cicd-aws || true'
-          ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@$bookcrud-cicd-aws.duckdns.org 'sudo docker rm bookcrud-cicd-aws || true'
+          ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@bookcrud-cicd-aws.duckdns.org 'sudo docker stop bookcrud-cicd-aws || true'
+          ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@bookcrud-cicd-aws.duckdns.org 'sudo docker rm bookcrud-cicd-aws || true'
       - name: Run new container
         run: |
-          ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@$bookcrud-cicd-aws.duckdns.org 'sudo docker run -d -p80:8080 --name bookcrud-cicd-aws koffarn/bookcrud-cicd-aws:latest'
+          ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@bookcrud-cicd-aws.duckdns.org 'sudo docker run -d -p80:8080 --name bookcrud-cicd-aws koffarn/bookcrud-cicd-aws:latest'
