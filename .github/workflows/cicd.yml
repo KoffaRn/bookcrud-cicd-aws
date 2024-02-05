@@ -39,6 +39,7 @@ jobs:
     steps:
       - name: Set private key
         run: |
+          touch key.pem
           echo "${{ secrets.AWS_PRIVATE_KEY }}" > key.pem
           chmod 600 private_key.pem
       - name: Pull docker image
