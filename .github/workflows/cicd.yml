@@ -33,3 +33,21 @@ jobs:
         with:
           name: Package
           path: staging/*.jar
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Set private key
+        run: |
+          echo "${{ secrets.AWS_PRIVATE_KEY }}" > key.pem
+          chmod 600 private_key.pem
+      - name: Pull docker image
+        run: |
+          ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@${{ secrets.AWS_EC2_IP }} 'sudo docker pull koffarn/bookcrud-cicd-aws:latest'
+      - name: Stop and remove old container
+        run: |
+          ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@${{ secrets.AWS_EC2_IP }} 'sudo docker stop bookcrud-cicd-aws || true'
+          ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@${{ secrets.AWS_EC2_IP }} 'sudo docker rm bookcrud-cicd-aws || true'
+      - name: Run new container
+        run: |
+          ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@${{ secrets.AWS_EC2_IP }} 'sudo docker run -d -p80:8080 --name bookcrud-cicd-aws koffarn/bookcrud-cicd-aws:latest'
