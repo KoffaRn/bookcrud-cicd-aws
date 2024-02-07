@@ -8,7 +8,6 @@ import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 @Configuration
 public class AwsServiceConfig {
     Region region = Region.EU_NORTH_1;
-
     @Bean
     public DynamoDbClient dynamoDbClient() {
         return DynamoDbClient.builder()
