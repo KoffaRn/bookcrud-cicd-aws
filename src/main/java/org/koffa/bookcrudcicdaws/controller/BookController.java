@@ -13,6 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BookController {
     private final BookDao bookDao;
+
     @GetMapping("")
     public ResponseEntity<List<Book>> getBooks() {
         return bookDao.scan().isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(bookDao.scan());
