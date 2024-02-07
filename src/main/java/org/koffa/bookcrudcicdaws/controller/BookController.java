@@ -16,7 +16,12 @@ public class BookController {
 
     @GetMapping("")
     public ResponseEntity<List<Book>> getBooks() {
-        return bookDao.scan().isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(bookDao.scan());
+        try {
+            return bookDao.scan().isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(bookDao.scan());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().build();
+        }
     }
     @GetMapping("/{id}")
     public ResponseEntity<Book> getBook(@PathVariable String id) {
