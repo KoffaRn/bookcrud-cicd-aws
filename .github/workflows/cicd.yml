@@ -27,8 +27,6 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          secrets: |
-            "SPRING_PASSWORD=${{ secrets.SPRING_PASSWORD }}"
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/bookcrud-cicd-aws:test
   deploy:
     runs-on: ubuntu-latest
