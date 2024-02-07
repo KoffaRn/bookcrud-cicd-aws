@@ -3,6 +3,8 @@ package org.koffa.bookcrudcicdaws.controller;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.ArrayList;
 
 import org.junit.jupiter.api.Test;
@@ -12,6 +14,7 @@ import org.koffa.bookcrudcicdaws.entity.Book;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.ResultActions;
@@ -30,13 +33,39 @@ class BookControllerDiffblueTest {
     private BookDao bookDao;
 
     /**
+     * Method under test: {@link BookController#deleteBook(Book)}
+     */
+    @Test
+    void testDeleteBook() throws Exception {
+        // Arrange
+        doNothing().when(bookDao).delete(Mockito.<Book>any());
+
+        Book book = new Book();
+        book.setAuthor("JaneDoe");
+        book.setId("42");
+        book.setTitle("Dr");
+        String content = (new ObjectMapper()).writeValueAsString(book);
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.delete("/books")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(content);
+
+        // Act and Assert
+        MockMvcBuilders.standaloneSetup(bookController)
+                .build()
+                .perform(requestBuilder)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType("text/plain;charset=ISO-8859-1"))
+                .andExpect(MockMvcResultMatchers.content().string("Book deleted"));
+    }
+
+    /**
      * Method under test: {@link BookController#getBook(String)}
      */
     @Test
     void testGetBook() throws Exception {
         // Arrange
         Book buildResult = Book.builder().author("JaneDoe").id("42").title("Dr").build();
-        when(bookDao.getBook(Mockito.any())).thenReturn(buildResult);
+        when(bookDao.getBook(Mockito.<String>any())).thenReturn(buildResult);
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/books/{id}", "42");
 
         // Act and Assert
@@ -91,16 +120,20 @@ class BookControllerDiffblueTest {
     @Test
     void testSaveBook() throws Exception {
         // Arrange
-        doNothing().when(bookDao).save(Mockito.any());
-        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.post("/books");
+        Book book = new Book();
+        book.setAuthor("JaneDoe");
+        book.setId("42");
+        book.setTitle("Dr");
+        String content = (new ObjectMapper()).writeValueAsString(book);
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.post("/books")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(content);
 
-        // Act and Assert
-        MockMvcBuilders.standaloneSetup(bookController)
-                .build()
-                .perform(requestBuilder)
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
-                .andExpect(MockMvcResultMatchers.content().string("{\"id\":null,\"title\":null,\"author\":null}"));
+        // Act
+        ResultActions actualPerformResult = MockMvcBuilders.standaloneSetup(bookController).build().perform(requestBuilder);
+
+        // Assert
+        actualPerformResult.andExpect(MockMvcResultMatchers.status().is(400));
     }
 
     /**
@@ -109,9 +142,17 @@ class BookControllerDiffblueTest {
     @Test
     void testSaveBook2() throws Exception {
         // Arrange
-        doNothing().when(bookDao).save(Mockito.any());
-        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.post("/books");
-        requestBuilder.contentType("https://example.org/example");
+        Book buildResult = Book.builder().author("JaneDoe").id("42").title("Dr").build();
+        when(bookDao.save(Mockito.<Book>any())).thenReturn(buildResult);
+
+        Book book = new Book();
+        book.setAuthor("JaneDoe");
+        book.setId(null);
+        book.setTitle("Dr");
+        String content = (new ObjectMapper()).writeValueAsString(book);
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.post("/books")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(content);
 
         // Act and Assert
         MockMvcBuilders.standaloneSetup(bookController)
@@ -119,7 +160,7 @@ class BookControllerDiffblueTest {
                 .perform(requestBuilder)
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
-                .andExpect(MockMvcResultMatchers.content().string("{\"id\":null,\"title\":null,\"author\":null}"));
+                .andExpect(MockMvcResultMatchers.content().string("{\"id\":\"42\",\"title\":\"Dr\",\"author\":\"JaneDoe\"}"));
     }
 
     /**
@@ -129,8 +170,16 @@ class BookControllerDiffblueTest {
     void testUpdateBook() throws Exception {
         // Arrange
         Book buildResult = Book.builder().author("JaneDoe").id("42").title("Dr").build();
-        when(bookDao.update(Mockito.any())).thenReturn(buildResult);
-        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.put("/books");
+        when(bookDao.update(Mockito.<Book>any())).thenReturn(buildResult);
+
+        Book book = new Book();
+        book.setAuthor("JaneDoe");
+        book.setId("42");
+        book.setTitle("Dr");
+        String content = (new ObjectMapper()).writeValueAsString(book);
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.put("/books")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(content);
 
         // Act and Assert
         MockMvcBuilders.standaloneSetup(bookController)
@@ -138,6 +187,6 @@ class BookControllerDiffblueTest {
                 .perform(requestBuilder)
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
-                .andExpect(MockMvcResultMatchers.content().string("{\"id\":null,\"title\":null,\"author\":null}"));
+                .andExpect(MockMvcResultMatchers.content().string("{\"id\":\"42\",\"title\":\"Dr\",\"author\":\"JaneDoe\"}"));
     }
 }

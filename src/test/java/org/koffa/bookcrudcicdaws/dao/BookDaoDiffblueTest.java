@@ -23,6 +23,7 @@ import software.amazon.awssdk.core.pagination.sync.SdkIterable;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.enhanced.dynamodb.Key;
+import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 import software.amazon.awssdk.enhanced.dynamodb.model.PageIterable;
 
 @ContextConfiguration(classes = {BookDao.class})
@@ -43,14 +44,14 @@ class BookDaoDiffblueTest {
         DynamoDbTable<Object> dynamoDbTable = mock(DynamoDbTable.class);
         Book buildResult = Book.builder().author("JaneDoe").id("42").title("Dr").build();
         when(dynamoDbTable.getItem(Mockito.<Key>any())).thenReturn(buildResult);
-        when(dynamoDbEnhancedClient.table(Mockito.any(), Mockito.any()))
+        when(dynamoDbEnhancedClient.table(Mockito.<String>any(), Mockito.<TableSchema<Object>>any()))
                 .thenReturn(dynamoDbTable);
 
         // Act
         bookDao.getBook("42");
 
         // Assert
-        verify(dynamoDbEnhancedClient).table(Mockito.any(), Mockito.any());
+        verify(dynamoDbEnhancedClient).table(Mockito.<String>any(), Mockito.<TableSchema<Object>>any());
         verify(dynamoDbTable).getItem(Mockito.<Key>any());
     }
 
@@ -62,34 +63,17 @@ class BookDaoDiffblueTest {
         // Arrange
         DynamoDbTable<Object> dynamoDbTable = mock(DynamoDbTable.class);
         doNothing().when(dynamoDbTable).putItem(Mockito.<Object>any());
-        when(dynamoDbEnhancedClient.table(Mockito.any(), Mockito.any()))
+        when(dynamoDbEnhancedClient.table(Mockito.<String>any(), Mockito.<TableSchema<Object>>any()))
                 .thenReturn(dynamoDbTable);
+        Book book = new Book("42", "Dr", "JaneDoe");
 
         // Act
-        bookDao.save(new Book("42", "Dr", "JaneDoe"));
+        Book actualSaveResult = bookDao.save(book);
 
         // Assert
-        verify(dynamoDbEnhancedClient).table(Mockito.any(), Mockito.any());
+        verify(dynamoDbEnhancedClient).table(Mockito.<String>any(), Mockito.<TableSchema<Object>>any());
         verify(dynamoDbTable).putItem(Mockito.<Object>any());
-    }
-
-    /**
-     * Method under test: {@link BookDao#save(Book)}
-     */
-    @Test
-    void testSave2() {
-        // Arrange
-        DynamoDbTable<Object> dynamoDbTable = mock(DynamoDbTable.class);
-        doNothing().when(dynamoDbTable).putItem(Mockito.<Object>any());
-        when(dynamoDbEnhancedClient.table(Mockito.any(), Mockito.any()))
-                .thenReturn(dynamoDbTable);
-
-        // Act
-        bookDao.save(new Book(null, "Dr", "JaneDoe"));
-
-        // Assert
-        verify(dynamoDbEnhancedClient).table(Mockito.any(), Mockito.any());
-        verify(dynamoDbTable).putItem(Mockito.<Object>any());
+        assertSame(book, actualSaveResult);
     }
 
     /**
@@ -100,14 +84,14 @@ class BookDaoDiffblueTest {
         // Arrange
         DynamoDbTable<Object> dynamoDbTable = mock(DynamoDbTable.class);
         when(dynamoDbTable.deleteItem(Mockito.<Key>any())).thenReturn("Delete Item");
-        when(dynamoDbEnhancedClient.table(Mockito.any(), Mockito.any()))
+        when(dynamoDbEnhancedClient.table(Mockito.<String>any(), Mockito.<TableSchema<Object>>any()))
                 .thenReturn(dynamoDbTable);
 
         // Act
         bookDao.delete(new Book("42", "Dr", "JaneDoe"));
 
         // Assert
-        verify(dynamoDbEnhancedClient).table(Mockito.any(), Mockito.any());
+        verify(dynamoDbEnhancedClient).table(Mockito.<String>any(), Mockito.<TableSchema<Object>>any());
         verify(dynamoDbTable).deleteItem(Mockito.<Key>any());
     }
 
@@ -119,14 +103,14 @@ class BookDaoDiffblueTest {
         // Arrange
         DynamoDbTable<Object> dynamoDbTable = mock(DynamoDbTable.class);
         when(dynamoDbTable.deleteItem(Mockito.<Key>any())).thenReturn("Delete Item");
-        when(dynamoDbEnhancedClient.table(Mockito.any(), Mockito.any()))
+        when(dynamoDbEnhancedClient.table(Mockito.<String>any(), Mockito.<TableSchema<Object>>any()))
                 .thenReturn(dynamoDbTable);
 
         // Act
         bookDao.delete(new Book());
 
         // Assert
-        verify(dynamoDbEnhancedClient).table(Mockito.any(), Mockito.any());
+        verify(dynamoDbEnhancedClient).table(Mockito.<String>any(), Mockito.<TableSchema<Object>>any());
         verify(dynamoDbTable).deleteItem(Mockito.<Key>any());
     }
 
@@ -138,7 +122,7 @@ class BookDaoDiffblueTest {
         // Arrange
         DynamoDbTable<Object> dynamoDbTable = mock(DynamoDbTable.class);
         when(dynamoDbTable.updateItem(Mockito.<Object>any())).thenReturn("Update Item");
-        when(dynamoDbEnhancedClient.table(Mockito.any(), Mockito.any()))
+        when(dynamoDbEnhancedClient.table(Mockito.<String>any(), Mockito.<TableSchema<Object>>any()))
                 .thenReturn(dynamoDbTable);
         Book book = new Book("42", "Dr", "JaneDoe");
 
@@ -146,7 +130,7 @@ class BookDaoDiffblueTest {
         Book actualUpdateResult = bookDao.update(book);
 
         // Assert
-        verify(dynamoDbEnhancedClient).table(Mockito.any(), Mockito.any());
+        verify(dynamoDbEnhancedClient).table(Mockito.<String>any(), Mockito.<TableSchema<Object>>any());
         verify(dynamoDbTable).updateItem(Mockito.<Object>any());
         assertSame(book, actualUpdateResult);
     }
@@ -166,7 +150,7 @@ class BookDaoDiffblueTest {
         when(pageIterable.items()).thenReturn(sdkIterable);
         DynamoDbTable<Object> dynamoDbTable = mock(DynamoDbTable.class);
         when(dynamoDbTable.scan()).thenReturn(pageIterable);
-        when(dynamoDbEnhancedClient.table(Mockito.any(), Mockito.any()))
+        when(dynamoDbEnhancedClient.table(Mockito.<String>any(), Mockito.<TableSchema<Object>>any()))
                 .thenReturn(dynamoDbTable);
 
         // Act
@@ -174,7 +158,7 @@ class BookDaoDiffblueTest {
 
         // Assert
         verify(sdkIterable).stream();
-        verify(dynamoDbEnhancedClient).table(Mockito.any(), Mockito.any());
+        verify(dynamoDbEnhancedClient).table(Mockito.<String>any(), Mockito.<TableSchema<Object>>any());
         verify(dynamoDbTable).scan();
         verify(pageIterable).items();
         assertTrue(actualScanResult.isEmpty());
