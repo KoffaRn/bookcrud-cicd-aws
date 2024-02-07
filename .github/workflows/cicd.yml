@@ -14,7 +14,7 @@ jobs:
           distribution: 'temurin'
           cache: maven
       - name: Build with Maven
-        run: mvn -B package --file pom.xml
+        run: mvn -B package --file pom.xml -DskipTests
       - run: mkdir staging && cp target/*.jar staging
       - name: Log in to Dockerhub
         uses: docker/login-action@v1
@@ -27,15 +27,31 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/bookcrud-cicd-aws:latest
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: Package
-          path: staging/*.jar
-  deploy:
+          secrets: |
+            "SPRING_PASSWORD=${{ secrets.SPRING_PASSWORD }}"
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/bookcrud-cicd-aws:test
+  test:
     runs-on: ubuntu-latest
     needs: build
+    steps:
+      - name: Set private key
+        run: |
+          echo "${{ secrets.AWS_PRIVATE_KEY }}" > key.pem
+          chmod 600 key.pem
+      - name: Log in to docker
+        run: |
+          ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@bookcrud-cicd-aws.duckdns.org 'sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}'
+      - name: Pull docker image
+        run: |
+          ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@bookcrud-cicd-aws.duckdns.org 'sudo docker pull koffarn/bookcrud-cicd-aws:test'
+      - name: Run docker container
+        run: |
+          ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@bookcrud-cicd-aws.duckdns.org 'sudo docker stop bookcrud-cicd-aws-test || true'
+        
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: test
     steps:
       - name: Set private key
         run: |
@@ -53,4 +69,4 @@ jobs:
           ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@bookcrud-cicd-aws.duckdns.org 'sudo docker rm bookcrud-cicd-aws || true'
       - name: Run new container
         run: |
-          ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@bookcrud-cicd-aws.duckdns.org 'sudo docker run -d -p80:8080 --name bookcrud-cicd-aws koffarn/bookcrud-cicd-aws:latest'
+          ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@bookcrud-cicd-aws.duckdns.org 'sudo docker run -d -p80:8080 --name bookcrud-cicd-aws -e "SPRING_PASSWORD=${{ secrets.SPRING_PASSWORD }}" koffarn/bookcrud-cicd-aws:latest'

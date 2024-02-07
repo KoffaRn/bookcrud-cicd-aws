@@ -27,20 +27,32 @@ public class BookController {
         }
     }
     @PostMapping("")
-    public ResponseEntity<Book> saveBook(Book book) {
+    public ResponseEntity<Book> saveBook(@RequestBody Book book) {
         try {
-            bookDao.save(book);
-            return ResponseEntity.ok(book);
+            if(book.getId() != null)
+                return ResponseEntity.badRequest().build();
+            Book newBook = bookDao.save(book);
+            return ResponseEntity.ok(newBook);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.badRequest().build();
         }
     }
     @PutMapping("")
-    public ResponseEntity<Book> updateBook(Book book) {
+    public ResponseEntity<Book> updateBook(@RequestBody Book book) {
         try {
             bookDao.update(book);
             return ResponseEntity.ok(book);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().build();
+        }
+    }
+    @DeleteMapping("")
+    public ResponseEntity<String> deleteBook(@RequestBody Book book) {
+        try {
+            bookDao.delete(book);
+            return ResponseEntity.ok("Book deleted");
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.badRequest().build();

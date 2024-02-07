@@ -18,10 +18,10 @@ public class BookDao {
     public Book getBook(String id) {
         return getMappedTable(Book.class).getItem(Key.builder().partitionValue(id).build());
     }
-    public void save(Book book) {
-        if(book.getId() == null) book.setId(UUID.randomUUID().toString());
-        if(book.getId().isEmpty()) book.setId(UUID.randomUUID().toString());
+    public Book save(Book book) {
+        book.setId(UUID.randomUUID().toString());
         getMappedTable(Book.class).putItem(book);
+        return book;
     }
     public void delete(Book book) {
         getMappedTable(Book.class).deleteItem(Key.builder().partitionValue(book.getId()).build());
