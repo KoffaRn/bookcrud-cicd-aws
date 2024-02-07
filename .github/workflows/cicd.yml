@@ -43,7 +43,7 @@ jobs:
           distribution: 'temurin'
           cache: maven
       - name: Test with Maven
-        run: mvn test
+        run: mvn -DSPRING_PASSWORD=test test
       - name: Set private key
         run: |
           echo "${{ secrets.AWS_PRIVATE_KEY }}" > key.pem
