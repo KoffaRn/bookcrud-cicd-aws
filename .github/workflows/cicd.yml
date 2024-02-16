@@ -6,9 +6,9 @@ env:
   DOCKERHUB_USERNAME: koffarn
   DOCKERHUB_TEST_TAG: bookcrud-cicd-aws:test
   DOCKERHUB_LATEST_TAG: bookcrud-cicd-aws:latest
-  AWS_SSH: ec2-user@bookcrud-cicd-aws.duckdns.org
   DOCKER_TEST_NAME: bookcrud-cicd-aws-test
   DOCKER_LATEST_NAME: bookcrud-cicd-aws-latest
+  AWS_SSH: ec2-user@bookcrud-cicd-aws.duckdns.org
 jobs:
   build:
     runs-on: ubuntu-latest
