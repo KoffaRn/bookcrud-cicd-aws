@@ -2,7 +2,7 @@
 * [CI/CD](#cicd) 
 * [OpenApi definition](#openapi-definition)
 * [Smoke test script](#smoke-test-script)
-## CI/CD
+## CI/CD 
 This project uses GitHub actions for CI/CD. The workflow is defined in [`.github/workflows/cicd.yml`](.github/workflows/cicd.yml).
 
 ### Build
