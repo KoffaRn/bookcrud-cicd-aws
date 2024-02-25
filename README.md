@@ -3,7 +3,7 @@
 * [OpenApi definition](#openapi-definition)
 * [Smoke test script](#smoke-test-script)
 ## CI/CD
-This project uses github actions for CI/CD. The workflow is defined in [`.github/workflows/cicd.yml`](.github/workflows/cicd.yml).
+This project uses GitHub actions for CI/CD. The workflow is defined in [`.github/workflows/cicd.yml`](.github/workflows/cicd.yml).
 
 ### Build
 Builds the project using maven, skipping tests, puts the jar in a docker container and pushes it to dockerhub with test tag. Also puts the jar in an artifact and publishes it on GitHub actions.
